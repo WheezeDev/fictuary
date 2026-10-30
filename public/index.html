@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fanfic Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Fanfic Library</h1>
+  <form id="addForm" class="add">
+    <input id="addInput" type="text" placeholder="Paste an AO3 story link (you can paste several)" autocomplete="off">
+    <button type="submit">Save</button>
+  </form>
+</header>
+<div id="notice" class="notice" hidden></div>
+<div id="waiting" class="waiting" hidden></div>
+
+<main id="libraryView" class="layout">
+  <aside class="side">
+    <input id="search" type="search" placeholder="Search title, author, tags">
+    <div class="group">
+      <h2>Shelf</h2>
+      <div id="shelves"></div>
+    </div>
+    <div class="group"><h2>My tags</h2><div id="myTagList" class="taglist"></div></div>
+    <div class="group"><h2>Fandoms</h2><div id="fandomList" class="taglist"></div></div>
+    <div class="group"><h2>Ships</h2><div id="shipList" class="taglist"></div></div>
+    <div class="group"><h2>AO3 tags</h2><div id="freeList" class="taglist"></div></div>
+  </aside>
+  <section class="main">
+    <div class="bar">
+      <div id="filters" class="filters"></div>
+      <select id="sort">
+        <option value="added">Recently saved</option>
+        <option value="updated">Recently updated on AO3</option>
+        <option value="title">Title</option>
+        <option value="words">Longest first</option>
+      </select>
+    </div>
+    <div id="list" class="list"></div>
+  </section>
+</main>
+
+<section id="readerView" class="reader" hidden>
+  <div class="readerbar">
+    <button id="backBtn" type="button">Back</button>
+    <div class="rtitle"><strong id="rTitle"></strong> <span id="rAuthor" class="muted"></span></div>
+    <select id="rStatus">
+      <option value="to-read">To read</option>
+      <option value="reading">Reading</option>
+      <option value="finished">Finished</option>
+    </select>
+    <button id="rMore" type="button">Details</button>
+  </div>
+  <div id="rDetails" class="rdetails" hidden>
+    <div class="row"><span class="label">My tags</span><span id="rMyTags" class="chips"></span>
+      <input id="rTagInput" list="tagSuggest" placeholder="add #tag"><datalist id="tagSuggest"></datalist></div>
+    <div class="row"><span class="label">Notes</span><textarea id="rNotes" rows="2" placeholder="Anything you want to remember about this one"></textarea></div>
+    <div class="row actions">
+      <button id="rUpdate" type="button">Check for new chapters</button>
+      <a id="rEpub" href="#">Download e-book</a>
+      <a id="rAo3" href="#" target="_blank" rel="noopener">Open on AO3</a>
+      <button id="rDelete" type="button" class="danger">Remove from library</button>
+    </div>
+  </div>
+  <iframe id="rFrame" title="Story"></iframe>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
