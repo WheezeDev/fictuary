@@ -40,3 +40,15 @@ details (`meta.json`). Because this folder is in OneDrive, it is backed up too.
 
 `test/fake-ao3.js` is a pretend AO3 for trying the app without touching the real site:
 run `node test/fake-ao3.js`, then start the app with `AO3_TEST_SITE=http://localhost:4399`.
+
+## Phone version (iPhone and Android)
+
+The `mobile` folder is a separate app for phones. It keeps stories inside the phone, so it
+works with no internet and without this computer. See `MOBILE_PLAN.md` for how it works.
+
+It has to be put online once (for example GitHub Pages) before a phone can install it.
+To try it on this computer: `node test/make-downloads.js` (makes sample AO3 downloads),
+then `node test/serve.js` and open http://localhost:4400/mobile/.
+
+When you change any file in `mobile`, change `VERSION` in `mobile/sw.js` so phones pick up
+the new version.

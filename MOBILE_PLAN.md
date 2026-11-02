@@ -1,6 +1,6 @@
 # Fanfic Library on iPhone - plan
 
-Status: plan only, nothing built yet.
+Status: built in the `mobile` folder (Nov 2026). Not yet put online, and not yet tried on a real iPhone or with a real AO3 download.
 
 ## The goal
 
