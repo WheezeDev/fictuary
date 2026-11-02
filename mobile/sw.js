@@ -1,7 +1,7 @@
 // Keeps the app's own screens on the phone so it opens with no internet.
 // Stories are not here; they are in the phone's database (see store.js).
 // Change VERSION whenever the app's files change, so phones pick up the new version.
-const VERSION = 'v3';
+const VERSION = 'v4';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'ao3.js', 'store.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 

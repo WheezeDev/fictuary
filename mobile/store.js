@@ -22,9 +22,29 @@ const Store = (() => {
       const out = fn(tx.objectStore(store));
       tx.oncomplete = () => resolve(out && 'result' in out ? out.result : undefined);
       tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error); // a full phone shows up here as a "QuotaExceededError"
+    });
+  }
+  // Saves a story's text and details together: either both are saved or neither is,
+  // so a full phone never leaves half a story behind.
+  async function putStory(text, work) {
+    const d = await db();
+    return new Promise((resolve, reject) => {
+      const tx = d.transaction(['texts', 'works'], 'readwrite');
+      try {
+        tx.objectStore('texts').put(text);
+        tx.objectStore('works').put(work);
+      } catch (err) {
+        tx.abort();
+        return reject(err);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
     });
   }
   return {
+    putStory,
     allWorks: () => run('works', 'readonly', (s) => s.getAll()),
     getWork: (id) => run('works', 'readonly', (s) => s.get(id)),
     putWork: (w) => run('works', 'readwrite', (s) => s.put(w)),

@@ -60,17 +60,45 @@ $('fileInput').onchange = async (e) => {
   const files = [...e.target.files];
   e.target.value = '';
   const results = [];
-  for (const file of files) {
+  for (const [i, file] of files.entries()) {
     try {
       results.push(await addStory(await file.text()));
     } catch (err) {
-      results.push(`${file.name}: ${err.message}`);
+      if (!isPhoneFull(err)) { results.push(`${file.name}: ${err.message}`); continue; }
+      await loadLibrary();
+      const left = files.length - i;
+      return phoneFull(`${left === 1 ? `"${file.name}" was` : `${left} stories were`} not saved because your phone is out of space.`);
     }
   }
   await loadLibrary();
   if (results.length === 1) toast(results[0], 5000);
   else toast(results.join('\n'), 7000);
 };
+
+// ---------- when the phone is full ----------
+
+const isPhoneFull = (err) => !!err && (err.name === 'QuotaExceededError' || /quota/i.test(err.message || ''));
+let fullShown = false;
+
+async function phoneFull(firstLine) {
+  let used = '';
+  if (navigator.storage && navigator.storage.estimate) {
+    const { usage } = await navigator.storage.estimate();
+    used = `\n\nFictuary is using about ${(usage / 1048576).toFixed(1)} MB for ${plural(state.works.length, 'story')}.`;
+  }
+  await ask(`${firstLine || 'Your phone is out of space, so Fictuary could not save your last change.'}${used}\n\n` +
+    'To make room, free up space on your phone (for example old photos or videos), or remove stories you have finished from Fictuary. Then try again.\n\n' +
+    'Your saved stories are still here.', [['ok', 'OK', 'primary']]);
+}
+
+// Catches a full phone during smaller saves too (your place, tags, notes), without repeating the message every scroll.
+window.addEventListener('unhandledrejection', (e) => {
+  if (!isPhoneFull(e.reason)) return;
+  e.preventDefault();
+  if (fullShown) return;
+  fullShown = true;
+  phoneFull().then(() => setTimeout(() => (fullShown = false), 120000)); // can warn again later, just not every scroll
+});
 
 async function addStory(html) {
   const parsed = AO3.parse(html);
@@ -79,9 +107,8 @@ async function addStory(html) {
   const now = new Date().toISOString();
 
   if (!old) {
-    await Store.putText({ id: meta.id, chapters, storyNotes, endNotes });
-    await saveWork({ ...meta, myTags: [], notes: '', status: 'to-read', position: { ch: 0, p: 0 }, newChapters: 0,
-      readChapters: 0, addedAt: now, savedAt: now, lastReadAt: null });
+    await Store.putStory({ id: meta.id, chapters, storyNotes, endNotes }, { ...meta, myTags: [], notes: '', status: 'to-read',
+      position: { ch: 0, p: 0 }, newChapters: 0, readChapters: 0, addedAt: now, savedAt: now, lastReadAt: null, changedAt: now });
     return `Added "${meta.title}".`;
   }
 
@@ -102,7 +129,7 @@ async function addStory(html) {
   const work = {
     ...old, ...meta,
     myTags: old.myTags, notes: old.notes, addedAt: old.addedAt, lastReadAt: old.lastReadAt,
-    savedAt: now,
+    savedAt: now, changedAt: now,
     newChapters: (old.newChapters || 0) + added,
   };
   if (added && wasCaughtUp) {
@@ -111,8 +138,7 @@ async function addStory(html) {
   }
   if (meta.chapterCount < old.chapterCount && work.position.ch >= meta.chapterCount) work.position = { ch: meta.chapterCount - 1, p: 0 };
   if (work.complete && work.status === 'caught-up') work.status = 'finished';
-  await Store.putText({ id: meta.id, chapters, storyNotes, endNotes });
-  await saveWork(work);
+  await Store.putStory({ id: meta.id, chapters, storyNotes, endNotes }, work);
   if (added) return `"${meta.title}": ${plural(added, 'new chapter')}.`;
   if (shorter) return `Replaced "${meta.title}" with the new version.`;
   return `"${meta.title}" is already up to date.`;
@@ -480,8 +506,14 @@ $('restoreInput').onchange = async (e) => {
     const mine = await Store.getWork(w.id);
     if (mine && mine.changedAt >= w.changedAt) continue;
     if (!texts.has(w.id)) continue;
-    await Store.putText(texts.get(w.id));
-    await Store.putWork(w);
+    try {
+      await Store.putStory(texts.get(w.id), w);
+    } catch (err) {
+      if (!isPhoneFull(err)) throw err;
+      await loadLibrary();
+      closeSheets();
+      return phoneFull(`Your phone ran out of space partway through restoring. ${plural(added + updated, 'story')} restored before that.`);
+    }
     mine ? updated++ : added++;
   }
   await loadLibrary();
