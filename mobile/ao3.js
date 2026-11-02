@@ -3,7 +3,8 @@ const AO3 = (() => {
   const text = (el) => (el ? el.textContent.replace(/\s+/g, ' ').trim() : '');
 
   // AO3 stories are written by users, so only keep harmless formatting.
-  const DROP = 'script,iframe,object,embed,link,meta,form,input,button,textarea,select,base,frame,frameset,svg,math';
+  // Also drops AO3's "Afterword" heading and "see the end of the chapter" links, which point nowhere here.
+  const DROP = 'script,iframe,object,embed,link,meta,form,input,button,textarea,select,base,frame,frameset,svg,math,.toc-heading,.endnote-link';
   function clean(root) {
     root.querySelectorAll(DROP).forEach((el) => el.remove());
     root.querySelectorAll('*').forEach((el) => {
@@ -52,14 +53,14 @@ const AO3 = (() => {
     const authors = [...preface.querySelectorAll('.byline a[rel="author"], .byline a')].map(text).filter(Boolean);
     const byline = text(preface.querySelector('.byline')).replace(/^by\s+/i, '');
 
-    // Summary is a <p>Summary</p> followed by a blockquote.
+    // Summary and the author's notes are each a <p>Summary</p> or <p>Notes</p> followed by a blockquote.
     let summary = '';
+    let storyNotes = '';
     for (const p of preface.querySelectorAll('p')) {
-      if (/^summary/i.test(text(p))) {
-        const bq = p.nextElementSibling;
-        if (bq && bq.tagName === 'BLOCKQUOTE') summary = [...bq.querySelectorAll('p')].map(text).join('\n\n') || text(bq);
-        break;
-      }
+      const bq = p.nextElementSibling;
+      if (!bq || bq.tagName !== 'BLOCKQUOTE') continue;
+      if (/^summary/i.test(text(p)) && !summary) summary = [...bq.querySelectorAll('p')].map(text).join('\n\n') || text(bq);
+      if (/^notes/i.test(text(p)) && !storyNotes) storyNotes = clean(bq).innerHTML;
     }
 
     // Chapters: each starts with a block holding an h2 heading. One-chapter stories have none.
@@ -76,7 +77,9 @@ const AO3 = (() => {
         continue;
       }
       if (!current) { current = { title: '', html: '' }; chapters.push(current); }
-      current.html += node.nodeType === 1 ? node.outerHTML : (node.textContent.trim() ? node.textContent : '');
+      // Only real text and tags; AO3 also leaves hidden markers like <!--chapter content--> in the file.
+      if (node.nodeType === 1) current.html += node.outerHTML;
+      else if (node.nodeType === 3 && node.textContent.trim()) current.html += node.textContent.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
     }
     const kept = chapters.filter((c) => c.html.trim() || c.title);
     if (kept.length === 1 && !kept[0].title) kept[0].title = title;
@@ -107,6 +110,7 @@ const AO3 = (() => {
       chaptersLabel: done + '/' + total,
       complete: total !== '?' && done === total,
       chapters: kept,
+      storyNotes,
       endNotes: afterword ? clean(afterword).innerHTML : '',
     };
   }

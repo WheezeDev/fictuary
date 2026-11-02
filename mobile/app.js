@@ -74,12 +74,12 @@ $('fileInput').onchange = async (e) => {
 
 async function addStory(html) {
   const parsed = AO3.parse(html);
-  const { chapters, endNotes, ...meta } = parsed;
+  const { chapters, storyNotes, endNotes, ...meta } = parsed;
   const old = await Store.getWork(meta.id);
   const now = new Date().toISOString();
 
   if (!old) {
-    await Store.putText({ id: meta.id, chapters, endNotes });
+    await Store.putText({ id: meta.id, chapters, storyNotes, endNotes });
     await saveWork({ ...meta, myTags: [], notes: '', status: 'to-read', position: { ch: 0, p: 0 }, newChapters: 0,
       readChapters: 0, addedAt: now, savedAt: now, lastReadAt: null });
     return `Added "${meta.title}".`;
@@ -111,7 +111,7 @@ async function addStory(html) {
   }
   if (meta.chapterCount < old.chapterCount && work.position.ch >= meta.chapterCount) work.position = { ch: meta.chapterCount - 1, p: 0 };
   if (work.complete && work.status === 'caught-up') work.status = 'finished';
-  await Store.putText({ id: meta.id, chapters, endNotes });
+  await Store.putText({ id: meta.id, chapters, storyNotes, endNotes });
   await saveWork(work);
   if (added) return `"${meta.title}": ${plural(added, 'new chapter')}.`;
   if (shorter) return `Replaced "${meta.title}" with the new version.`;
@@ -260,7 +260,8 @@ async function openReader(id, fromHistory) {
 
   const firstNew = w.chapterCount - (w.newChapters || 0);
   const head = `<div class="story-head"><h1>${esc(w.title)}</h1><div>by ${esc(w.authors.join(', '))}</div>
-    ${w.summary ? `<p>${esc(w.summary).replace(/\n+/g, '<br>')}</p>` : ''}</div>`;
+    ${w.summary ? `<p>${esc(w.summary).replace(/\n+/g, '<br>')}</p>` : ''}
+    ${text.storyNotes ? `<p><strong>Notes</strong></p>${text.storyNotes}` : ''}</div>`;
   $('story').innerHTML = head + text.chapters.map((c, i) => `<section data-ch="${i}">
       ${w.chapterCount > 1 || c.title ? `<h2 class="ch-title">${esc(c.title || 'Chapter ' + (i + 1))}${w.newChapters && i >= firstNew ? ' <span class="badge new">new</span>' : ''}</h2>` : ''}
       ${c.html}</section>`).join('') +
