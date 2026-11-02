@@ -1,10 +1,10 @@
-# Fanfic Library
+# Fictuary
 
 Save AO3 stories to this computer so you can read them even when AO3 is down.
 
 ## Starting it
 
-Double-click **Start Fanfic Library.bat**. A black window opens (leave it open) and your
+Double-click **Start Fictuary.bat**. A black window opens (leave it open) and your
 library opens in the browser at http://localhost:4321. Close the black window to stop it.
 
 ## Saving a story
@@ -46,7 +46,9 @@ run `node test/fake-ao3.js`, then start the app with `AO3_TEST_SITE=http://local
 The `mobile` folder is a separate app for phones. It keeps stories inside the phone, so it
 works with no internet and without this computer. See `MOBILE_PLAN.md` for how it works.
 
-It has to be put online once (for example GitHub Pages) before a phone can install it.
+It is online at https://wheezedev.github.io/fictuary/ (published automatically from the
+`mobile` folder whenever changes are pushed to GitHub). Open that address in Safari, tap
+Share, then Add to Home Screen.
 To try it on this computer: `node test/make-downloads.js` (makes sample AO3 downloads),
 then `node test/serve.js` and open http://localhost:4400/mobile/.
 

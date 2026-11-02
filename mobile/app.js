@@ -1,4 +1,4 @@
-// Fanfic Library for phones - screens and reading
+// Fictuary for phones - screens and reading
 const $ = (id) => document.getElementById(id);
 const state = { works: [], search: '', shelf: 'all', filters: [], open: null, markers: [], textSize: 1 };
 const SHELVES = [['all', 'All'], ['new', 'New chapters'], ['reading', 'Reading'], ['to-read', 'To read'], ['caught-up', 'Caught up'], ['finished', 'Finished']];
@@ -440,12 +440,12 @@ $('menuBtn').onclick = () => { renderMenu(); openSheet('menuSheet'); };
 async function backup() {
   const works = await Store.allWorks();
   const texts = await Store.allTexts();
-  const data = JSON.stringify({ app: 'fanfic-library', version: 1, createdAt: new Date().toISOString(), works, texts });
-  const name = `fanfic-library-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  const data = JSON.stringify({ app: 'fictuary', version: 1, createdAt: new Date().toISOString(), works, texts });
+  const name = `fictuary-backup-${new Date().toISOString().slice(0, 10)}.json`;
   const file = new File([data], name, { type: 'application/json' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Fanfic Library backup' }); // iPhone: choose "Save to Files"
+      await navigator.share({ files: [file], title: 'Fictuary backup' }); // iPhone: choose "Save to Files"
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(file);
@@ -471,7 +471,7 @@ $('restoreInput').onchange = async (e) => {
   if (!file) return;
   let data;
   try { data = JSON.parse(await file.text()); } catch { data = null; }
-  if (!data || data.app !== 'fanfic-library') return toast('That file is not a Fanfic Library backup.');
+  if (!data || data.app !== 'fictuary') return toast('That file is not a Fictuary backup.');
   const texts = new Map(data.texts.map((t) => [t.id, t]));
   let added = 0, updated = 0;
   // Merge: stories missing here are added, and for stories on both, the more recently changed copy wins.

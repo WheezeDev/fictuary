@@ -1,6 +1,6 @@
 {
-  "name": "Fanfic Library",
-  "short_name": "Fanfic",
+  "name": "Fictuary",
+  "short_name": "Fictuary",
   "description": "Keep your AO3 stories on your phone, readable even when AO3 is down.",
   "start_url": "./",
   "scope": "./",

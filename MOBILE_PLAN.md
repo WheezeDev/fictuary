@@ -1,4 +1,4 @@
-# Fanfic Library on iPhone - plan
+# Fictuary on iPhone - plan
 
 Status: built in the `mobile` folder (Nov 2026). Not yet put online, and not yet tried on a real iPhone or with a real AO3 download.
 
@@ -60,7 +60,7 @@ reinstalling it every 7 days. The Home Screen web app avoids all of that.
 1. Open the story on AO3 in Safari.
 2. Tap **Download**, then **HTML**. This is AO3's own button and gives you all chapters in one
    file. It saves to the Files app.
-3. In Fanfic Library, tap **Add story** and pick that file.
+3. In Fictuary, tap **Add story** and pick that file.
 4. The app reads the title, author, summary, word count, chapters and all AO3 tags from the
    file and puts the story in your library.
 

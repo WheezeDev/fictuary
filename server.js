@@ -1,4 +1,4 @@
-// Fanfic Library - a small local app that saves AO3 stories to this folder
+// Fictuary - a small local app that saves AO3 stories to this folder
 // so they can be read even when AO3 is down. No installs needed beyond Node.
 const http = require('http');
 const fs = require('fs');
@@ -10,7 +10,7 @@ const LIB = path.join(ROOT, 'library');
 const PUBLIC = path.join(ROOT, 'public');
 const QUEUE_FILE = path.join(LIB, '_waiting.json');
 const AO3 = process.env.AO3_TEST_SITE || 'https://archiveofourown.org'; // test site only used by test/fake-ao3.js
-const UA = 'FanficLibrary/1.0 (personal offline reading copy)';
+const UA = 'Fictuary/1.0 (personal offline reading copy)';
 const RETRY_MINUTES = 10;
 
 fs.mkdirSync(LIB, { recursive: true });
@@ -290,7 +290,7 @@ const server = http.createServer(async (req, res) => {
 if (require.main === module) {
   setInterval(retryQueue, RETRY_MINUTES * 60 * 1000);
   server.listen(PORT, '127.0.0.1', () => {
-    console.log('Fanfic Library is running at http://localhost:' + PORT);
+    console.log('Fictuary is running at http://localhost:' + PORT);
     console.log('Keep this window open while you use it. Close it to stop.');
     setTimeout(retryQueue, 5000);
   });

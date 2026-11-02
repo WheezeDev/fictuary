@@ -4,7 +4,7 @@ const Store = (() => {
   let dbp;
   function db() {
     dbp ||= new Promise((resolve, reject) => {
-      const req = indexedDB.open('fanfic-library', 1);
+      const req = indexedDB.open('fictuary', 1);
       req.onupgradeneeded = () => {
         req.result.createObjectStore('works', { keyPath: 'id' });
         req.result.createObjectStore('texts', { keyPath: 'id' });

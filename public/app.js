@@ -1,4 +1,4 @@
-// Fanfic Library - screen logic
+// Fictuary - screen logic
 const $ = (id) => document.getElementById(id);
 const state = { works: [], waiting: [], search: '', shelf: 'all', filters: [], sort: 'added', open: null };
 const SHELVES = [['all', 'Everything'], ['to-read', 'To read'], ['reading', 'Reading'], ['finished', 'Finished'], ['new', 'New chapters']];
